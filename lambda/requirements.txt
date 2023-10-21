@@ -1,0 +1,5 @@
+boto3==1.9.216
+ask-sdk-core==1.11.0
+epicstore_api==0.1.7
+DateTime==5.2
+deep-translator==1.11.4
