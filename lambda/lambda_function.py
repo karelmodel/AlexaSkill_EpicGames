@@ -18,10 +18,8 @@ from deep_translator import GoogleTranslator
 
 from ask_sdk_model import Response
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -40,7 +38,6 @@ class LaunchRequestHandler(AbstractRequestHandler):
                 .ask(speak_output)
                 .response
         )
-
 
 class FreeGamesIntentHandler(AbstractRequestHandler):
     """Handler for Free Epic Games Intent."""
@@ -77,6 +74,39 @@ class FreeGamesIntentHandler(AbstractRequestHandler):
                 .response
         )
 
+class UpcomingFreeGamesIntentHandler(AbstractRequestHandler):
+    """Handler for Free Epic Games Intent."""
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("UpcomingFreeGamesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        api = EpicGamesStoreAPI()
+        promotions = api.get_free_games()
+        
+        date_format = '%Y-%m-%d'
+        
+        upcomingFreeGames = []
+        upcomingFreeGamesDescription = []
+        
+        for game in promotions['data']['Catalog']['searchStore']['elements']:
+            if game.get('promotions') != None:
+                if game['promotions'].get('upcomingPromotionalOffers') != None:
+                    if game['promotions']['upcomingPromotionalOffers'] != []:
+                        if(game['title'] != 'Mystery Game'):
+                            upcomingStartDate=datetime.strptime(game['promotions']['upcomingPromotionalOffers'][0]['promotionalOffers'][0]['startDate'][0:10], date_format)
+                            upcomingDiscountPercentage=game['promotions']['upcomingPromotionalOffers'][0]['promotionalOffers'][0]['discountSetting']['discountPercentage']
+                            
+                            if upcomingStartDate > datetime.today() and upcomingDiscountPercentage == 0:
+                                upcomingFreeGames.append(game['title'])
+                                upcomingFreeGamesDescription.append(GoogleTranslator(source='auto', target='pt').translate(game['description']).replace("\n", " "))
+                                
+        speak_output = "Os próximos jogos de graça são: " + upcomingFreeGames[0] + " e " + upcomingFreeGames[1] + ". " + upcomingFreeGamesDescription[0] + " " + upcomingFreeGamesDescription[1]
+        
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                .response
+        )
 
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -195,6 +225,7 @@ sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(FreeGamesIntentHandler())
+sb.add_request_handler(UpcomingFreeGamesIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())

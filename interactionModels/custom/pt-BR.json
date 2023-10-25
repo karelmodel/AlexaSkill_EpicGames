@@ -26,6 +26,14 @@
             "jogos de graça",
             "me mostre os jogos de graça"
           ]
+        },
+        {
+          "slots": [],
+          "name": "UpcomingFreeGamesIntent",
+          "samples": [
+            "quais jogos de graça ainda vão ser lançados",
+            "próximos jogos de graça"
+          ]
         }
       ],
       "types": [],
