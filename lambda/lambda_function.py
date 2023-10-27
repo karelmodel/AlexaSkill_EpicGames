@@ -58,13 +58,10 @@ class FreeGamesIntentHandler(AbstractRequestHandler):
                 if game['promotions'].get('promotionalOffers') != None:
                     if game['promotions']['promotionalOffers'] != []:
                         if(game['title'] != 'Mystery Game'):
-                            startDate=datetime.strptime(game['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['startDate'][0:10], date_format)
-                            endDate=datetime.strptime(game['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['endDate'][0:10], date_format)
-                            discountPercentage=game['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['discountSetting']['discountPercentage']
-                            
-                            if endDate > datetime.today() and discountPercentage == 0:
-                                freeGames.append(game['title'])
-                                freeGamesDescription.append(GoogleTranslator(source='auto', target='pt').translate(game['description']).replace("\n", " "))
+                            for promotionalOffer in game['promotions']['promotionalOffers'][0]['promotionalOffers']:
+                                if datetime.strptime(promotionalOffer['endDate'][0:10], date_format) > datetime.today() and promotionalOffer['discountSetting']['discountPercentage'] == 0:
+                                    freeGames.append(game['title'])
+                                    freeGamesDescription.append(GoogleTranslator(source='auto', target='pt').translate(game['description']).replace("\n", " "))
                                 
         speak_output = "Os jogos que estão de graça hoje são: " + freeGames[0] + " e " + freeGames[1] + ". " + freeGamesDescription[0] + " " + freeGamesDescription[1]
         
@@ -93,12 +90,10 @@ class UpcomingFreeGamesIntentHandler(AbstractRequestHandler):
                 if game['promotions'].get('upcomingPromotionalOffers') != None:
                     if game['promotions']['upcomingPromotionalOffers'] != []:
                         if(game['title'] != 'Mystery Game'):
-                            upcomingStartDate=datetime.strptime(game['promotions']['upcomingPromotionalOffers'][0]['promotionalOffers'][0]['startDate'][0:10], date_format)
-                            upcomingDiscountPercentage=game['promotions']['upcomingPromotionalOffers'][0]['promotionalOffers'][0]['discountSetting']['discountPercentage']
-                            
-                            if upcomingStartDate > datetime.today() and upcomingDiscountPercentage == 0:
-                                upcomingFreeGames.append(game['title'])
-                                upcomingFreeGamesDescription.append(GoogleTranslator(source='auto', target='pt').translate(game['description']).replace("\n", " "))
+                            for upcomingPromotionalOffer in game['promotions']['upcomingPromotionalOffers'][0]['promotionalOffers']:
+                                if datetime.strptime(upcomingPromotionalOffer['endDate'][0:10], date_format) > datetime.today() and upcomingPromotionalOffer['discountSetting']['discountPercentage'] == 0:
+                                    upcomingFreeGames.append(game['title'])
+                                    upcomingFreeGamesDescription.append(GoogleTranslator(source='auto', target='pt').translate(game['description']).replace("\n", " "))
                                 
         speak_output = "Os próximos jogos de graça são: " + upcomingFreeGames[0] + " e " + upcomingFreeGames[1] + ". " + upcomingFreeGamesDescription[0] + " " + upcomingFreeGamesDescription[1]
         
